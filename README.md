@@ -1,2 +1,3 @@
-INF5620-Exercise-24
+INF5620-Projects
 ===================
+Jens Kristoffer Reitan Markussen
