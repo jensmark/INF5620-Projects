@@ -3,7 +3,7 @@ from math import pi
 from numpy import exp
 
 class Problem:
-	def __init__(self, m = 0.43, g = -9.81, rho = 1000, mu = 0.00089, r = 11, CD = 0.45):
+	def __init__(self, m = 0.43, g = 9.81, rho = 1000, mu = 0.00089, r = 11, CD = 0.45):
 		self.m, self.g, self.rho, self.mu, self.r, self.CD = m, g, rho, mu, r, CD
 
 	def define_command_line_options(self, parser = None):
@@ -14,7 +14,7 @@ class Problem:
 		parser.add_argument("--m", "--body_mass", 
 				type=float, default=0.43, help="mass of body in kg")
 		parser.add_argument("--g", "--gravity", 
-				type=float, default=-9.81, help="gravity in m/s^2")
+				type=float, default=9.81, help="gravity in m/s^2")
 		parser.add_argument("--rho", "--water_density", 
 				type=float, default=1000, help="density of water in kg/m^3")
 		parser.add_argument("--mu", "--dynamic_viscosity", 
@@ -34,7 +34,7 @@ class Problem:
 		return t
 
 class Solver:
-	def __init__(self, problem, dt=2.0):
+	def __init__(self, problem, dt=0.5):
 		self.problem = problem
 		self.dt = dt
 
@@ -44,7 +44,7 @@ class Solver:
 			parser = argparse.ArgumentParser()
 
 		parser.add_argument("--dt", "--time_step_value", 
-				type=float, default=2.0, help="time step value")
+				type=float, default=0.5, help="time step value")
 
 		return parser
 
@@ -57,7 +57,7 @@ class Solver:
 
 	def error(self):
 		# return numerical error
-		return 0.0
+		return None
 
 class Visualizer:
 	def __init__(self, problem, solver):
@@ -68,10 +68,12 @@ class Visualizer:
 			import scitools.std as plt
 
 		plt.plot(self.solver.t, self.solver.v, 'b--o')
+		"""
 		t_e = np.linspace(0, 10, 1001)
 		from vertical_motion_mod import exact_solution
 		u_e = exact_solution(t_e, self.problem.m, self.problem.g, self.problem.rho, self.problem.mu, self.problem.r)
 		plt.plot(t_e, u_e, 'b-')
+		"""
 		
 		plt.hold("on")
 		plt.xlabel("t")
