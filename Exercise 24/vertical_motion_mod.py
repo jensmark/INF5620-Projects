@@ -50,11 +50,11 @@
 """
 
 import numpy as np
-from math import pi
+from math import pi, sqrt
 from numpy import exp
 
-def solver(dt, m, g, rho, mu, r, CD):
-	T = float(5)
+def solver(dt, T, m, g, rho, mu, r, CD, drag = True):
+	T = float(T)
 	dt = float(dt)
 	Nt = int(round(T/dt))
 	T =	Nt*dt
@@ -67,8 +67,7 @@ def solver(dt, m, g, rho, mu, r, CD):
 	A = pi * (r * 0.01)**2
 	
 	# Start in idle position
-	v[0] = 0
-	print "starting computing"
+	v[0] = 1
 	for n in range(0, Nt):
 		Re = (rho * d * abs(v[n])) / mu
 		
@@ -76,9 +75,13 @@ def solver(dt, m, g, rho, mu, r, CD):
 			return g * ((rho / rhob) - 1)
 		
 		# Use Stokes drag model
-		if Re < 1:
-			def a():
-				return (3.0 * pi * d * mu) / (rhob * V)
+		if Re < 1 or not drag:
+			if(drag):
+				def a():
+					return (3.0 * pi * d * mu) / (rhob * V)
+			else:
+				def a():
+					return (rhob * V)
 				
 			v[n+1] = ((v[n] - 0.5 * dt * a() * v[n] + dt * b()) / (1.0 + 0.5 * dt * a()))
 			
@@ -91,20 +94,53 @@ def solver(dt, m, g, rho, mu, r, CD):
 			
 	return v, t
 
-"""	
-def exact_solution(t, m, g, rho, mu, r):
+def exact_solution_neg_drag(t, m, g, rho, mu, r):
 	V = (4/3) * pi * ((r * 0.01)**3)
 	rhob = m / V
 	d = (r * 0.01) * 2
-	A = pi * d	
+	A = pi * (r * 0.01)**2
 	
 	def a():
-		return (3 * pi * d * mu) / (rhob * V)
+		return (rhob * V)
 	def b():
 		return g * ((rho / rhob) - 1)
 	
-	return (b() * exp(-a() * t) * (exp(a() - t) - 1.0)) / a()
-"""	
+	return (b() * exp(-a() * t) * (exp(a()*t) - 1.0)) / a()
+
+def verify_terminal_velocity(m, g, rho, mu, r, CD):
+	V = (4/3) * pi * ((r * 0.01)**3)
+	rhob = m / V
+	d = (r * 0.01) * 2
+	A = pi * (r * 0.01)**2
+
+	def b():
+		return g * ((rho / rhob) - 1)
+	def a():
+		return (3.0 * pi * d * mu) / (rhob * V)
+			
+	vT = b() / a()
+	v1 = -a() * vT + b() 
 	
-def verify_convergence_rate():
-    return True  # all tests passed
+	def a():
+		return (0.5) * CD * ((rho * A) / (rhob * V))
+		
+	vT = sqrt(b() / a())
+	v2 = -a() * abs(vT) * vT + b()
+	
+	return v1, v2
+	
+	
+"""
+m = len(dt_values)
+r = [log(E_values[i-1]/E_values[i])/
+                log(dt_values[i-1]/dt_values[i])
+                for i in range(1, m, 1)]
+"""	
+def verify_convergence_rate(r):
+	tol = 0.1
+	expected_rate = 2
+	r_final = r[-1]
+	diff = abs(expected_rate - r_final)
+	if diff > tol:
+		return False
+	return True 

@@ -3,8 +3,10 @@ from math import pi
 from numpy import exp
 
 class Problem:
-	def __init__(self, m = 0.43, g = 9.81, rho = 1000, mu = 0.00089, r = 11, CD = 0.45):
-		self.m, self.g, self.rho, self.mu, self.r, self.CD = m, g, rho, mu, r, CD
+	def __init__(self, m = 0.43, g = 9.81, 
+					rho = 1000, mu = 0.00089, r = 11, CD = 0.45):
+		self.m, self.g, self.rho = m, g, rho
+		self.mu, self.r, self.CD = mu, r, CD
 
 	def define_command_line_options(self, parser = None):
 		if parser is None:
@@ -27,16 +29,17 @@ class Problem:
 		return parser
 
 	def init_from_command_line(self, args):
-		self.m, self.g, self.rho, self.mu, self.r, self.CD = args.m, args.g, args.rho, args.mu, args.r, args.CD
+		self.m, self.g, self.rho = args.m, args.g, args.rho
+		self.mu, self.r, self.CD = args.mu, args.r, args.CD
 
 	def exact_solution(self, t):
 		# compute exact solution at time		
 		return t
 
 class Solver:
-	def __init__(self, problem, dt=0.5):
+	def __init__(self, problem, dt=0.5, T = 10):
 		self.problem = problem
-		self.dt = dt
+		self.dt, self.T = dt, T
 
 	def define_command_line_options(self, parser):
 		if parser is None:
@@ -45,15 +48,20 @@ class Solver:
 
 		parser.add_argument("--dt", "--time_step_value", 
 				type=float, default=0.5, help="time step value")
+		parser.add_argument("--T", "--simulation_time", 
+				type=float, default=10, help="total simulation time")
 
 		return parser
 
 	def init_from_command_line(self, args):
-		self.dt = args.dt
+		self.dt, self.T = args.dt, args.T
 	
 	def solve(self):
 		from vertical_motion_mod import solver
-		self.v, self.t = solver(self.dt, self.problem.m, self.problem.g, self.problem.rho, self.problem.mu, self.problem.r, self.problem.CD)
+		self.v, self.t = solver(self.dt, self.T, self.problem.m,
+								 self.problem.g, self.problem.rho,
+								  self.problem.mu, self.problem.r,
+								   self.problem.CD)
 
 	def error(self):
 		# return numerical error
@@ -68,12 +76,6 @@ class Visualizer:
 			import scitools.std as plt
 
 		plt.plot(self.solver.t, self.solver.v, 'b--o')
-		"""
-		t_e = np.linspace(0, 10, 1001)
-		from vertical_motion_mod import exact_solution
-		u_e = exact_solution(t_e, self.problem.m, self.problem.g, self.problem.rho, self.problem.mu, self.problem.r)
-		plt.plot(t_e, u_e, 'b-')
-		"""
 		
 		plt.hold("on")
 		plt.xlabel("t")
@@ -96,9 +98,6 @@ def main():
 	solver.solve()
 	import matplotlib.pyplot as plt
 	plt = viz.plot(plt = plt)
-	E = solver.error()
-	if E is not None:
-		print "Error: %.4E" % E
 	plt.show()	
 
 main()
