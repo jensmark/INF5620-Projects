@@ -1,0 +1,10 @@
+ * In general everything looks nice, better if you had wrapped all of it inside vertical_motion.py.
+ * Ok, class based solution which.
+ * You have almost no comments or docstrings. VERY important to use these, makes the code lucid and easier to read.
+ * In vertical motion you have a main() function which you are calling everytime the program runs. This should be put
+   into a if __name__ == '__main__': block instead.
+ * Besides from that the code is good and clean, appropriate use of whitespaces and line shifts.
+ * You still have some way to go when it comes to the tests. Some are missing, and some are not correct. Check it out, it will
+   be important later.
+
+Approved.
