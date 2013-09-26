@@ -12,6 +12,8 @@
 	
 	\section{Equations}
 		\subsection{Numerical Approximation Scheme}
+			\begin{align}
+			\end{align}
 		\subsection{Modified Scheme for First Step}
 		\subsection{Modified Scheme for Boundary Points}
 	
