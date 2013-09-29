@@ -11,25 +11,94 @@
 	
 	
 	\section{Equations}
-		\subsection{Numerical Approximation Scheme}
-		\begin{align}
-		u^{n+1}_{i, j} = 
-		\end{align}
-		\subsection{Modified Scheme for First Step}
-		\begin{align}		
-		u^{1}_{i, j} = 
-		\end{align}		
-		\subsection{Modified Scheme for Boundary Points}
-		\begin{align}		
-		u^{n+1}_{0, j} = 
-		\end{align}
-		\begin{align}		
-		u^{n+1}_{i, 0} = 
-		\end{align}		
-		\subsection{Source Term}
-		\begin{align}		
-		f(x, y, t) =  
-		\end{align}	
+		\subsection{Partial Differential Equation}
+		Two-dimensional, linear wave equation, with 
+		damping,
+
+		\begin{align*}
+		\frac{\partial^2u}{\partial t^2}
+		+ b\frac{\partial u}{\partial t} 
+		= \frac{\partial}{\partial x} 
+		\left(q(x,y)\frac{\partial u}{\partial x}
+		\right) + \frac{\partial}{\partial y}
+		\left(q(x,y)\frac{\partial u}{\partial y}
+		\right) + f(x,y,t)
+		\end{align*}
+		with boundary condition,
+		
+		\begin{align*}
+		\frac{\partial u}{\partial n} = 0		
+		\end{align*}				
+		
+		in a rectangular spatial domain 
+		with these conditions
+		\begin{align*}
+		\Omega = [0, L_x] \times [0, L_y]
+		\end{align*}
+		\begin{align*}
+		u(x,y,0) = I(x,y)
+		\end{align*}
+		\begin{align*}
+		u_t(x,y,0) = V(x,y)
+		\end{align*}
+						
+			
+		\subsection{Numerics}
+		PDE in compact finite difference notation
+		\begin{align*}
+		[D_tD_{t}u]^n_{i,j} + b[D_{2t}u]^n_{i,j} 
+		= [D_{x}\bar{q}^{x} D_{x}u]^n_{i,j} 
+		+ [D_{y}\bar{q}^{y} D_{y}u]^n_{i,j}
+		\end{align*}
+		Central difference approximations
+		\begin{align*}
+		\frac{\partial^2 u}{\partial t^2} 
+		\approx [D_tD_{t}u]^n_{i,j}
+		= \frac{u^{n+1}_{i,j} - 2u^{n}_{i,j}
+		+ u^{n-1}_{i,j}}{\Delta t^2}
+		\end{align*}
+		\begin{align*}
+		b\frac{\partial u}{\partial t}
+		\approx b[D_{2t}u]^n_{i,j}
+		= b\frac{u^{n+1}_{i,j} - 2u^{n-1}_{i,j}}
+		{2\Delta t}
+		\end{align*}
+		\begin{align*}
+		\frac{\partial}{\partial x} 
+		\left(q(x,y)\frac{\partial u}{\partial x}
+		\right)
+		\approx [D_{x}\bar{q}^{x} D_{x}u]^n_{i,j} 
+		\\ =\frac{1}{\Delta x}
+		\left[q_{i+\frac{1}{2},j}
+		\frac{u^{n}_{i+1,j}-u^{n}_{i,j}}{\Delta x}
+		-q_{i-\frac{1}{2},j}
+		\frac{u^{n}_{i,j}-u^{n}_{i-1,j}}{\Delta x}\right]
+		\end{align*}
+		\begin{align*}
+		\frac{\partial}{\partial y} 
+		\left(q(x,y)\frac{\partial u}{\partial y}
+		\right)
+		\approx [D_{y}\bar{q}^{y} D_{y}u]^n_{i,j} 
+		\\ =\frac{1}{\Delta y}
+		\left[q_{i,j+\frac{1}{2}}
+		\frac{u^{n}_{i,j+1}-u^{n}_{i,j}}{\Delta y}
+		-q_{i,j-\frac{1}{2}}
+		\frac{u^{n}_{i,j}-u^{n}_{i,j-1}}{\Delta y}\right]
+		\end{align*}
+		Initial condition approximation
+		\begin{align*}
+		\frac{\partial u}{\partial t}
+		\approx \frac{u^1_{i,j}-u^{-1}_{i,j}}{2\Delta t} 
+		 = V(x,y)
+		\end{align*}
+		Boundary condition approximation
+		\begin{align*}		
+		\frac{u^n_{1,j}-u^n_{-1,j}}{2\Delta x} = 0, t = 0	
+		\end{align*}
+		\begin{align*}		
+		\frac{u^n_{i,1}-u^n_{i,-1}}{2\Delta y} = 0, t = 0	
+		\end{align*}
+		\subsection{Discretization}
 		
 	\section{Implementation}
 	
