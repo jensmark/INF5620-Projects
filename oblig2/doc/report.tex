@@ -68,37 +68,91 @@
 		\left(q(x,y)\frac{\partial u}{\partial x}
 		\right)
 		\approx [D_{x}\bar{q}^{x} D_{x}u]^n_{i,j} 
-		\\ =\frac{1}{\Delta x}
+		 &=\frac{1}{\Delta x}
 		\left[q_{i+\frac{1}{2},j}
 		\frac{u^{n}_{i+1,j}-u^{n}_{i,j}}{\Delta x}
 		-q_{i-\frac{1}{2},j}
-		\frac{u^{n}_{i,j}-u^{n}_{i-1,j}}{\Delta x}\right]
+		\frac{u^{n}_{i,j}-u^{n}_{i-1,j}}{\Delta x}\right] \\
+		&= \frac{1}{\Delta x^2}\left(q_{i+\frac{1}{2},j}
+		(u^{n}_{i+1,j}-u^{n}_{i,j})-q_{i-\frac{1}{2},j}(
+		u^{n}_{i,j}-u^{n}_{i-1,j})\right)
 		\end{align*}
 		\begin{align*}
 		\frac{\partial}{\partial y} 
 		\left(q(x,y)\frac{\partial u}{\partial y}
 		\right)
 		\approx [D_{y}\bar{q}^{y} D_{y}u]^n_{i,j} 
-		\\ =\frac{1}{\Delta y}
+		 &=\frac{1}{\Delta y}
 		\left[q_{i,j+\frac{1}{2}}
 		\frac{u^{n}_{i,j+1}-u^{n}_{i,j}}{\Delta y}
 		-q_{i,j-\frac{1}{2}}
-		\frac{u^{n}_{i,j}-u^{n}_{i,j-1}}{\Delta y}\right]
+		\frac{u^{n}_{i,j}-u^{n}_{i,j-1}}{\Delta y}\right] \\
+		&= \frac{1}{\Delta y^2}\left(q_{i,j+\frac{1}{2}}
+		(u^{n}_{i,j+1}-u^{n}_{i,j})-q_{i,j-\frac{1}{2}}(
+		u^{n}_{i,j}-u^{n}_{i,j-1})\right)
 		\end{align*}
-		Initial condition approximation
+		
+		Relation for creating initial scheme
 		\begin{align*}
-		\frac{\partial u}{\partial t}
-		\approx \frac{u^1_{i,j}-u^{-1}_{i,j}}{2\Delta t} 
-		 = V(x,y)
+		\frac{\partial u}{\partial n} \approx \frac{u^{n+1}_{i,j} - 
+		2u^{n-1}_{i,j}}{2\Delta t}1 = 0
+		\end{align*}	
+		\begin{align*}
+		u^{-1}_{i,j} = u^{1}_{i,j} 
+		\end{align*}				
+		
+		\subsubsection*{Discretization}
+		Make $q$ only valid at the grid points using the arithmetic mean
+		\begin{align*}
+		q_{i,j+\frac{1}{2}} &= \frac{1}{2}(q_{i,j+1} + q_{i,j}) \\
+		q_{i,j-\frac{1}{2}} &= \frac{1}{2}(q_{i,j} + q_{i,j-1}) \\
+		q_{i+\frac{1}{2},j} &= \frac{1}{2}(q_{i+1,j} + q_{i,j}) \\
+		q_{i-\frac{1}{2},j} &= \frac{1}{2}(q_{i,j} + q_{i-1,j}) 
 		\end{align*}
-		Boundary condition approximation
-		\begin{align*}		
-		\frac{u^n_{1,j}-u^n_{-1,j}}{2\Delta x} = 0, t = 0	
+		
+		Full approximation scheme for $u^{n+1}_{i,j}$
+		\begin{align*}
+		u^{n+1}_{i,j} = & \left(1 + b\frac{\Delta t}{2}\right)^{-1} 
+		\biggl[2u^{n}_{i,j}+u^{n-1}_{i,j}\left(b\frac{\Delta t}{2}-1\right) \\
+		& +\frac{\Delta t^2}{2\Delta x^2}((q_{i+1,j} + q_{i,j})
+		(u^n_{i+1,j}-u^n_{i,j})-(q_{i,j} + q_{i-1,j})
+		(u^n_{i,j}-u^n_{i-1,j})) \\
+		& +\frac{\Delta t^2}{2\Delta y^2}((q_{i,j+1} + q_{i,j})
+		(u^n_{i,j+1}-u^n_{i,j})-(q_{i,j} + q_{i,j-1})
+		(u^n_{i,j}-u^n_{i,j-1})) \biggr]
 		\end{align*}
-		\begin{align*}		
-		\frac{u^n_{i,1}-u^n_{i,-1}}{2\Delta y} = 0, t = 0	
+		
+		Full approximation scheme at boundary ghost cells 
+		$u^{n+1}_{0,j}$, $u^{n+1}_{i,0}$, $u^{n+1}_{L_x,j}$ and 
+		$u^{n+1}_{i,L_y}$, and corner cells $u^{n+1}_{0,0}$, $u^{n+1}_{L_x,0}$
+		,$u^{n+1}_{L_x,L_y}$ and $u^{n+1}_{0,L_y}$
+		\begin{align*}
+		u^{n+1}_{0,j} = & \left(1 + b\frac{\Delta t}{2}\right)^{-1} 
+		\biggl[2u^{n}_{i,j}+u^{n-1}_{i,j}\left(b\frac{\Delta t}{2}-1\right) \\
+		& +\frac{\Delta t^2}{2\Delta x^2}((q_{1,j} + q_{0,j})
+		(u^n_{1,j}-u^n_{0,j})-(q_{0,j} + q_{1,j})
+		(u^n_{0,j}-u^n_{1,j})) \\
+		& +\frac{\Delta t^2}{2\Delta y^2}((q_{0,j+1} + q_{0,j})
+		(u^n_{0,j+1}-u^n_{0,j})-(q_{0,j} + q_{0,j-1})
+		(u^n_{0,j}-u^n_{0,j-1})) \biggr]
 		\end{align*}
-		\subsection{Discretization}
+		Equivalent scheme can be made for the other cells.\\
+		When computing $u^{n+1}$ we required knowledge of the mesh points
+		$u^{n}$ and $u^{n-1}$, which means that when computing $u^{1}$ 
+		we require knowledge of $u^{0}$ and $u^{-1}$. $u^{0}$ is defined 
+		by the initial conditions $I(x,y)$ and $V(x,y)$, however
+		we need a modified scheme for $u^{-1}$.
+		\begin{align*}
+		u^{-1}_{i,j} = u^{0}_{i,j}
+		& +\frac{\Delta t^2}{4\Delta x^2}((q_{i+1,j} + q_{i,j})
+		(u^0_{i+1,j}-u^0_{i,j})-(q_{i,j} + q_{i-1,j})
+		(u^0_{i,j}-u^0_{i-1,j})) \\
+		& +\frac{\Delta t^2}{4\Delta y^2}((q_{i,j+1} + q_{i,j})
+		(u^0_{i,j+1}-u^0_{i,j})-(q_{i,j} + q_{i,j-1})
+		(u^0_{i,j}-u^0_{i,j-1}))
+		\end{align*}
+		Scheme can also be used as initial condition scheme if modified
+		in the same way we modified the inner scheme.
 		
 	\section{Implementation}
 	
