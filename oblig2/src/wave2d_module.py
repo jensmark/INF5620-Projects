@@ -1,36 +1,14 @@
 #!/usr/bin/env python
-"""
-2D wave equation solved by finite differences::
 
-  dt, cpu_time = solver(I, V, f, c, Lx, Ly, Nx, Ny, dt, T,
-                        user_action=None, version='scalar',
-                        dt_safety_factor=1)
-
-Solve the 2D wave equation u_tt = u_xx + u_yy + f(x,t) on (0,L) with
-u=0 on the boundary and initial condition du/dt=0.
-
-Nx and Ny are the total number of mesh cells in the x and y
-directions. The mesh points are numbered as (0,0), (1,0), (2,0),
-..., (Nx,0), (0,1), (1,1), ..., (Nx, Ny).
-
-dt is the time step. If dt<=0, an optimal time step is used.
-T is the stop time for the simulation.
-
-I, V, f are functions: I(x,y), V(x,y), f(x,y,t). V and f
-can be specified as None or 0, resulting in V=0 and f=0.
-
-user_action: function of (u, x, y, t, n) called at each time
-level (x and y are one-dimensional coordinate vectors).
-This function allows the calling code to plot the solution,
-compute errors, etc.
-"""
 import time
 from scitools.std import *
+from scitools import easyviz
+from scitools.all import *
 
 def solver(I, V, f, b, q, Lx, Ly, Nx, Ny, dt, T,
            user_action=None, version='scalar'):
 	if version == 'compiled':
-		print 'Pre-compiled loops '
+		print 'Pre-compiled loops not yet implemented'
 		sys.exit(1)
 	elif version == 'vectorized':
 		advance = advance_vectorized
@@ -74,6 +52,8 @@ def solver(I, V, f, b, q, Lx, Ly, Nx, Ny, dt, T,
 	elif dt < stability_limit:
 		print "Error, invalid timestep for simulating"
 	
+	print "T", T
+	print "dt", dt
 	Nt = int(round(T/float(dt)))
 	t = linspace(0, Nt*dt, Nt+1)    # mesh points in time
 
@@ -125,6 +105,8 @@ def solver(I, V, f, b, q, Lx, Ly, Nx, Ny, dt, T,
 		u_2[:,:], u_1[:,:] = u_1, u
 
 	t1 = time.clock()
+	print "t0", t0
+	print "t1", t1
 	# dt might be computed in this function so return the value
 	return dt, t1 - t0
 
@@ -151,16 +133,17 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     else:
     	for i in Ix[1:-1]:
     		for j in Iy[1:-1]:
-    			u[i,j] = (1+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1)+\
+    			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
     				(dt2/2.0*dx2)*\
     					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
     						(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
 					(dt2/2.0*dy2)*\
 						((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
-    						(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1])))
+    						(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1])))+\
+					dt*f(x[i], y[j], t[n])
     						
-    """          
-    # Boundary condition u=0
+           
+    # Boundary condition du/dn=0
     j = Iy[0]
     for i in Ix: u[i,j] = 0
     j = Iy[-1]
@@ -169,8 +152,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     for j in Iy: u[i,j] = 0
     i = Ix[-1]
     for j in Iy: u[i,j] = 0
-    """
-    
+
     return u
 
 def advance_vectorized(u, u_1, u_2, f_a, b, q_a, dt,
@@ -200,50 +182,83 @@ def advance_vectorized(u, u_1, u_2, f_a, b, q_a, dt,
 
 import nose.tools as nt
 
-def test_quadratic(Nx=4, Ny=5):
-    def exact_solution(x, y, t):
-        return x*(Lx - x)*y*(Ly - y)*(1 + 0.5*t)
+def test_manufactored_solution():
+	print "Not implemented"
 
-    def I(x, y):
-        return exact_solution(x, y, 0)
+def test_standing_damped_waves():
+	print "Not implemented"
 
-    def V(x, y):
-        return 0.5*exact_solution(x, y, 0)
+def test_standing_undamped_waves():
+	print "Not implemented"
 
-    def f(x, y, t):
-        return 2*c**2*(1 + 0.5*t)*(y*(Ly - y) + x*(Lx - x))
+def test_constant_solution(verbose=False,version='scalar'):
+	Lx = 2
+	Ly = 2
+	Nx = 4
+	Ny = 4
+	T = 5
+	b = 0.0
+    
+	def q(x, y):
+		return 1.0
+		
+	# Constant initial condition gives constant solution
+	def I(x, y):
+		return 0.2
+	
+	def action_u(u, x, xv, y, yv, t, n):
+		if verbose:
+			print "u", u
+			print "t", t
+	
+	solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T, 
+		user_action=action_u, version=version)
+	
+def test_cubic_solution():
+	print "Not implemented"
 
-    Lx = 3;  Ly = 3
-    c = 1.5
-    dt = -1 # use longest possible steps
-    T = 18
-
-    def assert_no_error(u, x, xv, y, yv, t, n):
-        u_e = exact_solution(xv, yv, t[n])
-        diff = abs(u - u_e).max()
-        #print n, version, diff
-        nt.assert_almost_equal(diff, 0, places=12)
-
-    for version in 'scalar', 'vectorized', 'compiled':
-        print 'testing', version
-        dt, cpu = solver(I, V, f, c, Lx, Ly, Nx, Ny, dt, T,
-                         user_action=assert_no_error,
-                         version=version)
-
+def test_1d_plug_solution(verbose=False,version='scalar'):
+	Lx = 2
+	Ly = 2
+	Nx = 4
+	Ny = 4
+	T = 5
+	b = 0.0
+    
+	def q(x, y):
+		return 1.0
+		
+	def I(x, y):
+		if abs(x-Lx/2.0) > 0.1:
+			return 0
+		else:
+			return 1
+	
+	def action_u(u, x, xv, y, yv, t, n):
+		if verbose:
+			print "u", u
+			print "t", t
+	
+	solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T, 
+		user_action=action_u, version=version)
 
 def run_efficiency_tests(nrefinements=4):
     def I(x, y):
         return sin(pi*x/Lx)*sin(pi*y/Ly)
-
+        
+    def q(x, y):
+    	return 1.5
+	
     Lx = 10;  Ly = 10
-    c = 1.5
+    b = 0.5
     T = 100
-    versions = ['scalar', 'vectorized', 'compiled']
+    ##versions = ['scalar', 'vectorized', 'compiled']
+    versions = ['scalar']
     print ' '*15, ''.join(['%-13s' % v for v in versions])
     for Nx in 15, 30, 60, 120:
         cpu = {}
         for version in versions:
-            dt, cpu_ = solver(I, None, None, c, Lx, Ly, Nx, Nx,
+            dt, cpu_ = solver(I, None, None, b, q, Lx, Ly, Nx, Nx,
                               -1, T, user_action=None,
                               version=version)
             cpu[version] = cpu_
@@ -265,10 +280,13 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
     for name in glob('tmp_*.png'):
         os.remove(name)
 
-    Lx = 10
-    Ly = 10
-    b = 0.5
-
+    Lx = 20
+    Ly = 20
+    b = 0.2
+    
+    def q(x, y):
+		return 1.0
+	
     def I(x, y):
         """Gaussian peak at (Lx/2, Ly/2)."""
         return exp(-0.5*(x-Lx/2.0)**2 - 0.5*(y-Ly/2.0)**2)
@@ -288,7 +306,7 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
             mesh(x, y, u, title='t=%g' % t[n], zlim=[-1,1],
                  caxis=[-1,1])
         elif plot_method == 2:
-			surfc(xv, yv, u, title='t=%g' % t[n], zlim=[-1, 1],
+			easyviz.surfc(xv, yv, u, title='t=%g' % t[n], zlim=[-1, 1],
 				colorbar=True, colormap=hot(), caxis=[-1,1],
 				shading='flat')
         elif plot_method == 3:
@@ -310,14 +328,73 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
                 savefig(filename)  # time consuming!
 
     Nx = 40; Ny = 40; T = 20
-    dt, cpu = solver(I, None, None, b, None, Lx, Ly, Nx, Ny, -1, T,
+    dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
                      user_action=plot_u, version=version)
 
+def run_physical_problem(plot_method=2, version='scalar', save_plot=False):
+    # Clean up plot files
+	for name in glob('tmp_*.png'):
+		os.remove(name)
+	
+	Lx = 20
+	Ly = 20
+	b = 0.1
+	g = 9.81
+	
+	def H(x,y):
+		return exp(-0.5*(x-Lx/2.0)**2 - 0.5*(y-Ly/2.0)**2)
+	
+	def q(x, y):
+		return g*H(x,y)
+	
+	def I(x, y):
+		return exp(-0.5*x**2)
+	
+	if plot_method == 3:
+		from mpl_toolkits.mplot3d import axes3d
+		import matplotlib.pyplot as plt
+		from matplotlib import cm
+		plt.ion()
+		fig = plt.figure()
+		u_surf = None
+	
+	def plot_u(u, x, xv, y, yv, t, n):
+		if t[n] == 0:
+			time.sleep(2)
+		if plot_method == 1:
+			mesh(x, y, u, title='t=%g' % t[n], zlim=[-1,1],
+				 caxis=[-1,1])
+		elif plot_method == 2:
+			easyviz.surfc(xv, yv, u, title='t=%g' % t[n], zlim=[-1, 1],
+				colorbar=True, colormap=hot(), caxis=[-1,1],
+				shading='flat')
+		elif plot_method == 3:
+			print 'Experimental 3D matplotlib...under development...'
+			#plt.clf()
+			ax = fig.add_subplot(111, projection='3d')
+			u_surf = ax.plot_surface(xv, yv, u, alpha=0.3)
+			#ax.contourf(xv, yv, u, zdir='z', offset=-100, cmap=cm.coolwarm)
+			#ax.set_zlim(-1, 1)
+			# Remove old surface before drawing
+			if u_surf is not None:
+				ax.collections.remove(u_surf)
+			plt.draw()
+			time.sleep(1)
+		if plot_method > 0:
+			time.sleep(0) # pause between frames
+			if save_plot:
+				filename = 'tmp_%04d.png' % n
+				savefig(filename)  # time consuming!
+
+	Nx = 40; Ny = 40; T = 20
+	dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
+		             user_action=plot_u, version=version)
 
 
 if __name__ == '__main__':
     import sys
     from scitools.misc import function_UI
-    cmd = function_UI([test_quadratic, run_efficiency_tests,
-                       run_Gaussian, ], sys.argv)
+    cmd = function_UI([run_efficiency_tests,
+                       run_Gaussian, 
+                       run_physical_problem, ], sys.argv)
     eval(cmd)
