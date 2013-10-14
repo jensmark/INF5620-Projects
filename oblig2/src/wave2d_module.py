@@ -52,8 +52,6 @@ def solver(I, V, f, b, q, Lx, Ly, Nx, Ny, dt, T,
 	elif dt < stability_limit:
 		print "Error, invalid timestep for simulating"
 	
-	print "T", T
-	print "dt", dt
 	Nt = int(round(T/float(dt)))
 	t = linspace(0, Nt*dt, Nt+1)    # mesh points in time
 
@@ -82,7 +80,7 @@ def solver(I, V, f, b, q, Lx, Ly, Nx, Ny, dt, T,
 
 	else:  # use vectorized version
 		f_a[:,:] = f(xv, yv, t[n])  # precompute, size as u
-		V_a = V(xv, yv)
+		V_a[:,:] = V(xv, yv)
 		u = advance(u, u_1, u_2, f_a, b, q_a, dt, V_a, step1=True)
 
 	if user_action is not None:
@@ -130,6 +128,47 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     				((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
     					(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1]))
     			u[i,j] += dt*V(x[i], y[j])
+    			
+    	# Boundary condition du/dn=0
+		j = Iy[0]
+		for i in Ix[1:-1]: 
+			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
+    				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+    				(dt2/4.0*dy2)*\
+    				((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j]))
+    			u[i,j] += dt*V(x[i], y[j])
+			
+		j = Iy[-1]
+		for i in Ix[1:-1]: 
+			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
+    				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+    				(dt2/4.0*dy2)*\
+    				((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1]))
+    			u[i,j] += dt*V(x[i], y[j])
+		
+		i = Ix[0]
+		for j in Iy[1:-1]: 
+			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
+    				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j]))+\
+    				(dt2/4.0*dy2)*\
+    				((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1]))
+    			u[i,j] += dt*V(x[i], y[j])
+		
+		i = Ix[-1]
+		for j in Iy[1:-1]: 
+			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
+    				((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+    				(dt2/4.0*dy2)*\
+    				((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+    					(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1]))
+    			u[i,j] += dt*V(x[i], y[j])
     else:
     	for i in Ix[1:-1]:
     		for j in Iy[1:-1]:
@@ -143,15 +182,50 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
 					dt*f(x[i], y[j], t[n])
     						
            
-    # Boundary condition du/dn=0
-    j = Iy[0]
-    for i in Ix: u[i,j] = 0
-    j = Iy[-1]
-    for i in Ix: u[i,j] = 0
-    i = Ix[0]
-    for j in Iy: u[i,j] = 0
-    i = Ix[-1]
-    for j in Iy: u[i,j] = 0
+		# Boundary condition du/dn=0
+		j = Iy[0]
+		for i in Ix[1:-1]: 
+			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
+				(dt2/2.0*dx2)*\
+					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+				(dt2/2.0*dy2)*\
+					((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])))+\
+				dt*f(x[i], y[j], t[n])
+			
+		j = Iy[-1]
+		for i in Ix[1:-1]: 
+			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
+				(dt2/2.0*dx2)*\
+					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+				(dt2/2.0*dy2)*\
+					((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1])))+\
+				dt*f(x[i], y[j], t[n])
+		
+		i = Ix[0]
+		for j in Iy[1:-1]: 
+			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
+				(dt2/2.0*dx2)*\
+					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j]))+\
+				(dt2/2.0*dy2)*\
+					((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1])))+\
+				dt*f(x[i], y[j], t[n])
+		
+		i = Ix[-1]
+		for j in Iy[1:-1]: 
+			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
+				(dt2/2.0*dx2)*\
+					((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
+				(dt2/2.0*dy2)*\
+					((q(x[i], y[j+1])+q(x[i], y[j]))*(u_1[i,j+1]-u_1[i,j])-\
+						(q(x[i], y[j])+q(x[i], y[j-1]))*(u_1[i,j]-u_1[i,j-1])))+\
+				dt*f(x[i], y[j], t[n])
 
     return u
 
@@ -280,8 +354,8 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
     for name in glob('tmp_*.png'):
         os.remove(name)
 
-    Lx = 20
-    Ly = 20
+    Lx = 10
+    Ly = 10
     b = 0.2
     
     def q(x, y):
@@ -327,7 +401,7 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
                 filename = 'tmp_%04d.png' % n
                 savefig(filename)  # time consuming!
 
-    Nx = 40; Ny = 40; T = 20
+    Nx = 20; Ny = 20; T = 10
     dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
                      user_action=plot_u, version=version)
 
@@ -336,8 +410,8 @@ def run_physical_problem(plot_method=2, version='scalar', save_plot=False):
 	for name in glob('tmp_*.png'):
 		os.remove(name)
 	
-	Lx = 20
-	Ly = 20
+	Lx = 10
+	Ly = 10
 	b = 0.1
 	g = 9.81
 	
@@ -386,7 +460,7 @@ def run_physical_problem(plot_method=2, version='scalar', save_plot=False):
 				filename = 'tmp_%04d.png' % n
 				savefig(filename)  # time consuming!
 
-	Nx = 40; Ny = 40; T = 20
+	Nx = 20; Ny = 20; T = 10
 	dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
 		             user_action=plot_u, version=version)
 
