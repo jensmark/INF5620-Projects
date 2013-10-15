@@ -8,7 +8,9 @@
  	\maketitle 
 	
 	\section{Introduction}
-	
+	Report describing the implementation and numerics used in the second 
+	obligatory exercise in the course INF5620 Numerical Methods for Partial
+	Differential Equations.
 	
 	\section{Equations}
 		\subsection{Partial Differential Equation}
@@ -140,8 +142,8 @@
 		When computing $u^{n+1}$ we required knowledge of the mesh points
 		$u^{n}$ and $u^{n-1}$, which means that when computing $u^{1}$ 
 		we require knowledge of $u^{0}$ and $u^{-1}$. $u^{0}$ is defined 
-		by the initial conditions $I(x,y)$ and $V(x,y)$, however
-		we need a modified scheme for $u^{-1}$.
+		by the initial conditions $I(x,y)$, however
+		we need a modified scheme for $u^{-1}$ as well as $V(x,y)$.
 		\begin{align*}
 		u^{-1}_{i,j} = u^{0}_{i,j}
 		& +\frac{\Delta t^2}{4\Delta x^2}((q_{i+1,j} + q_{i,j})
@@ -155,7 +157,32 @@
 		in the same way we modified the inner scheme.
 		
 	\section{Implementation}
+	The implementation is based on handout code \verb|wave2D_u0.py|, so the same 
+	base structure was followed when implementing the numerics described above.
+	The program can be executed in two different ways, one with the same
+	initial condition from the handout code, a smooth gaussian function in the
+	center of the domain and the other investigating a physical problem with
+	a sub-sea hill in the middle of the domain.
+	\begin{enumerate}
+	\item[] \verb|python wave2d_module.py --run_Gaussian|
+	\item[] \verb|python wave2d_module.py --run_physical_problem|
+	\end{enumerate}
+	The solver is implemented in two ways, regular scalar array iteration,
+	and \verb|numpy| vectorized array computations.
+	\subsection{Verification}
+	Implementation error verification is implemented using the python \verb|nose|
+	unit-test framework. The tests can be ran from the terminal with the command 
+	\verb|nosetests -v -s wave2d_module.py|, the runtime option \verb|-v| activates
+	verbose output, and the option \verb|-s| deactivates \verb|stdout| suppression.
+	\subsubsection*{Constant Solution}
+	Constant solution verification is implemented by modifying the initial 
+	condition to a constant value, $I(x,y)=C$. This should produce a constant 
+	solution array.
+	\subsubsection*{1D Plug Wave Solution in 2D}
+	1D plug wave solution verification is implemented by modifying the initial 
+	condition to be constant in some parts of the domain and zero elsewhere. 
+ 	The 2D program is tested by inserting a 1D plug wave in the $x$ direction with
+ 	no damping and a constant $q$.
 	
-	\section{Conclusion}
 
 \end{document}

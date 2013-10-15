@@ -131,7 +131,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     			
     	# Boundary condition du/dn=0
 		j = Iy[0]
-		for i in Ix[1:-1]: 
+		for i in Ix[0:-1]: 
 			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
     				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
     					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
@@ -141,7 +141,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     			u[i,j] += dt*V(x[i], y[j])
 			
 		j = Iy[-1]
-		for i in Ix[1:-1]: 
+		for i in Ix[0:-1]: 
 			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
     				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
     					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
@@ -151,7 +151,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     			u[i,j] += dt*V(x[i], y[j])
 		
 		i = Ix[0]
-		for j in Iy[1:-1]: 
+		for j in Iy[0:-1]: 
 			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
     				((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
     					(q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j]))+\
@@ -161,7 +161,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
     			u[i,j] += dt*V(x[i], y[j])
 		
 		i = Ix[-1]
-		for j in Iy[1:-1]: 
+		for j in Iy[0:-1]: 
 			u[i,j] = u_1[i,j]+(dt2/4.0*dx2)*\
     				((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
     					(q(x[i], y[j])+q(x[i-1], y[j]))*(u_1[i,j]-u_1[i-1,j]))+\
@@ -184,7 +184,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
            
 		# Boundary condition du/dn=0
 		j = Iy[0]
-		for i in Ix[1:-1]: 
+		for i in Ix[0:-1]: 
 			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
 				(dt2/2.0*dx2)*\
 					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
@@ -195,7 +195,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
 				dt*f(x[i], y[j], t[n])
 			
 		j = Iy[-1]
-		for i in Ix[1:-1]: 
+		for i in Ix[0:-1]: 
 			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
 				(dt2/2.0*dx2)*\
 					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
@@ -206,7 +206,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
 				dt*f(x[i], y[j], t[n])
 		
 		i = Ix[0]
-		for j in Iy[1:-1]: 
+		for j in Iy[0:-1]: 
 			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
 				(dt2/2.0*dx2)*\
 					((q(x[i+1], y[j])+q(x[i], y[j]))*(u_1[i+1,j]-u_1[i,j])-\
@@ -217,7 +217,7 @@ def advance_scalar(u, u_1, u_2, f, x, y, t, n, b, q, dt,
 				dt*f(x[i], y[j], t[n])
 		
 		i = Ix[-1]
-		for j in Iy[1:-1]: 
+		for j in Iy[0:-1]: 
 			u[i,j] = (1.0+B)**(-1)*(2.0*u_1[i,j]+u_2[i,j]*(B-1.0)+\
 				(dt2/2.0*dx2)*\
 					((q(x[i], y[j])+q(x[i], y[j]))*(u_1[i,j]-u_1[i,j])-\
@@ -278,7 +278,7 @@ def test_constant_solution(verbose=False,version='scalar'):
 		
 	# Constant initial condition gives constant solution
 	def I(x, y):
-		return 0.2
+		return 0.5
 	
 	def action_u(u, x, xv, y, yv, t, n):
 		if verbose:
@@ -401,7 +401,7 @@ def run_Gaussian(plot_method=2, version='scalar', save_plot=False):
                 filename = 'tmp_%04d.png' % n
                 savefig(filename)  # time consuming!
 
-    Nx = 20; Ny = 20; T = 10
+    Nx = 20; Ny = 20; T = 30
     dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
                      user_action=plot_u, version=version)
 
@@ -419,10 +419,10 @@ def run_physical_problem(plot_method=2, version='scalar', save_plot=False):
 		return exp(-0.5*(x-Lx/2.0)**2 - 0.5*(y-Ly/2.0)**2)
 	
 	def q(x, y):
-		return g*H(x,y)
+		return g+H(x,y)
 	
 	def I(x, y):
-		return exp(-0.5*x**2)
+		return exp(-0.5*(x)**2)
 	
 	if plot_method == 3:
 		from mpl_toolkits.mplot3d import axes3d
@@ -460,7 +460,7 @@ def run_physical_problem(plot_method=2, version='scalar', save_plot=False):
 				filename = 'tmp_%04d.png' % n
 				savefig(filename)  # time consuming!
 
-	Nx = 20; Ny = 20; T = 10
+	Nx = 20; Ny = 20; T = 30
 	dt, cpu = solver(I, None, None, b, q, Lx, Ly, Nx, Ny, -1, T,
 		             user_action=plot_u, version=version)
 
