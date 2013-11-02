@@ -1,0 +1,13 @@
+
+ * Ok report results, but where are the truncation error analysis?
+   Also some of the analytical results regarding the damped and undamped 
+   waves are missing.
+
+ * The solver in general is looking good. Use more commenting and docstrings.
+
+ * Tests are fine, but the more important tests are missing! Ok implementation
+   of physical problem.
+
+Try to finish everything before the exam, would be a smart move.
+
+Approved.
