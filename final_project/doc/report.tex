@@ -1,0 +1,48 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\author{Jens Kristoffer Reitan Markussen}
+\title{Final Project INF5620,\\ Nonlinear Diffusion Equation}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\paragraph*{}
+Final project report for INF5620 on numerical investigation and analysis of a nonlinear diffusion equation.
+
+\section{Nonlinear diffusion model}
+\paragraph*{}
+The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in space $x$ at time $0$. Norman condition on all boundaries.
+\begin{align}
+& \varrho u_t = \nabla \cdot (\alpha(u)\nabla u) + f(x,t),\\
+& u(x,0)=I(x),\\
+& \frac{\partial u}{\partial n} = 0
+\end{align}
+
+\section{Approximation}
+\paragraph*{} 
+While we will use the finite elements method to approximate the PDE in space, we use the forward euler scheme to derive an approximation in time.
+\begin{align}
+ & \left[\varrho D^+_t u  = \nabla \cdot (\alpha(u)\nabla u) + f(x,t)\right]^n\\
+ & u^{n+1}  = \varrho u^n +\Delta t (\nabla \cdot (\alpha(u^n)\nabla u^n)+ f(x,t_n))
+\end{align}
+\paragraph*{}
+Now that we have an expression for $u$ in time, we need to derive an approximation for $u$ in space using the finite elements method.
+\begin{align*}
+u^n &= \sum_{j=0}^N c^n_j \psi_j(x), \\
+u^{n+1} &= \sum_{j=0}^N c^{n+1}_j \psi_j(x)
+\end{align*}
+\paragraph*{}
+We then need to derive a variational formulation for the spatial problem and the initial condition
+\begin{align*}
+Variationalformulationhere
+\end{align*}
+
+\subsection{Picard iterations for $\alpha(u)$}
+
+
+
+\end{document}
