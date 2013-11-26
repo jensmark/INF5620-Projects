@@ -15,7 +15,7 @@ Final project report for INF5620 on numerical investigation and analysis of a no
 
 \section{Nonlinear diffusion model}
 \paragraph*{}
-The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in space $x$ at time $0$. Norman condition on all boundaries.
+The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in space $x$ at time $0$. Naumann condition on all boundaries.
 \begin{align}
 & \varrho u_t = \nabla \cdot (\alpha(u)\nabla u) + f(x,t),\\
 & u(x,0)=I(x),\\
@@ -24,24 +24,26 @@ The project will investigate this nonlinear diffusion equation with known coeffi
 
 \section{Approximation}
 \paragraph*{} 
-While we will use the finite elements method to approximate the PDE in space, we use the forward euler scheme to derive an approximation in time.
-\begin{align}
- & \left[\varrho D^+_t u  = \nabla \cdot (\alpha(u)\nabla u) + f(x,t)\right]^n\\
- & u^{n+1}  = \varrho u^n +\Delta t (\nabla \cdot (\alpha(u^n)\nabla u^n)+ f(x,t_n))
-\end{align}
-\paragraph*{}
-Now that we have an expression for $u$ in time, we need to derive an approximation for $u$ in space using the finite elements method.
+While we will use the finite elements method to approximate the PDE in space, we use the backwards euler scheme to derive an implicit approximation scheme in time.
 \begin{align*}
-u^n &= \sum_{j=0}^N c^n_j \psi_j(x), \\
-u^{n+1} &= \sum_{j=0}^N c^{n+1}_j \psi_j(x)
+ & \left[\varrho D^-_t u  = \nabla \cdot (\alpha(u)\nabla u) + f(x,t)\right]^n\\
+ & \varrho \frac{u^n-u^{n-1}}{\Delta t} = \nabla \cdot (\alpha(u^n)\nabla u^n)+ f(x,t_n)
 \end{align*}
 \paragraph*{}
-We then need to derive a variational formulation for the spatial problem and the initial condition
+Now that we have an expression for $u$ in time, we need to derive an approximation for $u$ in space using the finite elements method. We then need to derive a variational formulation $a(u,v)=L(v)$ for the spatial problem,
 \begin{align*}
-Variationalformulationhere
+\int\limits_\Omega \varrho \frac{u^n-u^{n-1}}{\Delta t}v dx = 
+- \int\limits_\Omega \alpha(u^n)\nabla u^n \cdot \nabla vdx + \int\limits_\Omega f(x, t_n)vdx + 
+\int\limits_{\partial\Omega}\nabla u^n \frac{\partial u^n}{\partial n} vds
+\end{align*}
+and the initial condition (Incomplete).
+\begin{align*}
+\int\limits_\Omega \varrho u^0 v dx = 
+- \int\limits_\Omega I(x) vdx + \int\limits_\Omega f(x, 0)vdx
 \end{align*}
 
 \subsection{Picard iterations for $\alpha(u)$}
+
 
 
 
