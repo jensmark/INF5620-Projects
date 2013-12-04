@@ -1,4 +1,5 @@
 from dolfin import *
+from numpy import *
 import time
 
 class UnitDomain:
@@ -15,7 +16,7 @@ class UnitDomain:
 		return self.d[2]
 	
 
-def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f = None, I = None, show = True):
+def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f = None, I = None, b = 0.0, show = True):
 	N = int(T/dt)
 	
 	if f == None:
@@ -23,7 +24,7 @@ def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f 
 	if I == None:
 		I = Constant(1.0)
 	if alpha == None:
-		alpha = Constant(1.0)
+		alpha = lambda u: 1.0
 	
 	if domain.dim() == 1:
 		mesh = UnitIntervalMesh(domain.x())	
@@ -37,24 +38,38 @@ def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f 
 
 	V = FunctionSpace(mesh, 'Lagrange', degree)
 	
-	#TODO compute real u0
+	u_ = interpolate(Constant(0.0), V)
 	u1 = interpolate(I, V)
 	
 	u = TrialFunction(V)
 	v = TestFunction(V)
 	
-	#TODO insert variational formulation from notes
-	F = u*v*dx + dt*inner(nabla_grad(u), nabla_grad(v))*dx - (u1 + dt*f)*v*dx + I*v*ds
+	f.t = 0
+	F = -rho*((u-u1)/dt)*v*dx - inner(alpha(u_)*nabla_grad(u), nabla_grad(v))*dx \
+		+ inner(f,v)*dx + alpha(u_)*b*v*ds
 	
 	u = Function(V)   # the unknown at a new time level
 	t = dt
-
+	
+	eps = 1.0
+	tol = 1.0E-5        # tolerance
+	c = 0           	# iteration counter
+	maxiter = 25        # max no of iterations allowed	
+	
 	while t < T + DOLFIN_EPS:
-		#TODO: Solve non-linearity
+		# Picard iterations
+		while eps > tol and c < maxiter:
+			A = assemble(lhs(F)) #Do we need to re-assemble matrix?
+			b = assemble(rhs(F))
+			c += 1
+			solve(A, u.vector(), b)
+			diff = u.vector().array() - u_.vector().array()
+			eps = linalg.norm(diff, ord=Inf)
+			u_.assign(u)   # update for next iteration
 		
-		A = assemble(lhs(F)) #Do we need to re-assemble matrix?
+		#u_ has changed, do we need to re-assemble matrix?
+		A = assemble(lhs(F)) 
 		b = assemble(rhs(F))
-		
 		f.t = t
 		solve(A, u.vector(), b)
 
@@ -62,7 +77,7 @@ def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f 
 		u1.assign(u)
 		if show:
 			plot(u)
-		time.sleep(dt) # 3 seconds
+		time.sleep(dt)
 				
 	return u
 
