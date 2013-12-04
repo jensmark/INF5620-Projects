@@ -25,24 +25,29 @@ The project will investigate this nonlinear diffusion equation with known coeffi
 \section{Approximation}
 \paragraph*{} 
 While we will use the finite elements method to approximate the PDE in space, we use the backwards euler scheme to derive an implicit approximation scheme in time.
-\begin{align*}
- & \left[\varrho D^-_t u  = \nabla \cdot (\alpha(u)\nabla u) + f(x,t)\right]^n\\
- & \varrho \frac{u^n-u^{n-1}}{\Delta t} = \nabla \cdot (\alpha(u^n)\nabla u^n)+ f(x,t_n)
-\end{align*}
+\begin{align}
+ & \left[\varrho D^-_t u  = \nabla \cdot (\alpha(u)\nabla u) + f\right]^n\\
+ & \varrho \frac{u^n-u^{n-1}}{\Delta t} = \nabla \cdot (\alpha(u^n)\nabla u^n)+ f^n %\\
+% & u^n - \Delta t \nabla \cdot (\alpha(u^n)\nabla u^n)+ f(x,t_n) = \varrho u^{n-1}
+\end{align}
 \paragraph*{}
-Now that we have an expression for $u$ in time, we need to derive an approximation for $u$ in space using the finite elements method. We then need to derive a variational formulation $a(u,v)=L(v)$ for the spatial problem,
-\begin{align*}
-\int\limits_\Omega \varrho \frac{u^n-u^{n-1}}{\Delta t}v dx = 
-- \int\limits_\Omega \alpha(u^n)\nabla u^n \cdot \nabla vdx + \int\limits_\Omega f(x, t_n)vdx + 
-\int\limits_{\partial\Omega}\nabla u^n \frac{\partial u^n}{\partial n} vds
-\end{align*}
-and the initial condition (Incomplete).
-\begin{align*}
-\int\limits_\Omega \varrho u^0 v dx = 
-- \int\limits_\Omega I(x) vdx + \int\limits_\Omega f(x, 0)vdx
-\end{align*}
-
+Now that we have an expression for $u$ in time, we need to derive an approximation for $u$ in space using the finite elements method. We then need to derive a variational formulation for the spatial problem,  $F(u;v)$.
+\begin{align}
+% a(u,v) &= \int_\Omega (\varrho u^n v + \Delta t\alpha(u^{n})\nabla u^{n} \cdot \nabla v) dx  \\
+%L(v) &= \int_\Omega \varrho u^{n-1}vdx + \Delta t \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u^{n})\frac{\partial u}{\partial n}vds
+\int_\Omega \varrho\frac{u^n-u^{n-1}}{\Delta t}vdx = -\int_\Omega\alpha(u^n)\nabla u^n \cdot \nabla v dx + \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u^{n})\frac{\partial u}{\partial n}vds
+\end{align}
 \subsection{Picard iterations for $\alpha(u)$}
+\paragraph*{}
+The problem described above is nonlinear because of the coefficient term $a(u)$. Before we can solve the PDE we need to somehow make this term linear. This can be done by replacing the unknown variable in the nonlinear term with something known.
+\paragraph*{}
+To reduce the amount of indices in our equations we introduce a new notation.
+\begin{align*}
+u^n &: u \\
+n^{n,k} &: u\_ \\
+u^{n-1} &: u_1
+\end{align*}
+Where $k$ is the picard iteration index. 
 
 
 
