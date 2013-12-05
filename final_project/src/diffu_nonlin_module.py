@@ -38,15 +38,16 @@ def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f 
 
 	V = FunctionSpace(mesh, 'Lagrange', degree)
 	
-	u_ = interpolate(Constant(0.0), V)
+	u_ = interpolate(I, V)
 	u1 = interpolate(I, V)
 	
 	u = TrialFunction(V)
 	v = TestFunction(V)
 	
 	f.t = 0
+	plot(u1)
 	F = -rho*((u-u1)/dt)*v*dx - inner(alpha(u_)*nabla_grad(u), nabla_grad(v))*dx \
-		+ inner(f,v)*dx + alpha(u_)*b*v*ds
+		+ inner(f,v)*dx + alpha(u_)*I*v*ds
 	
 	u = Function(V)   # the unknown at a new time level
 	t = dt
@@ -77,7 +78,7 @@ def solver(dt, T, domain = UnitDomain(), degree = 1, rho = 1.0, alpha = None, f 
 		u1.assign(u)
 		if show:
 			plot(u)
-		time.sleep(dt)
+		time.sleep(dt*10)
 				
 	return u
 

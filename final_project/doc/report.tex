@@ -17,8 +17,8 @@ Final project report for INF5620 on numerical investigation and analysis of a no
 \paragraph*{}
 The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in space $x$ at time $0$. Naumann condition on all boundaries.
 \begin{align}
-& \varrho u_t = \nabla \cdot (\alpha(u)\nabla u) + f(x,t),\\
-& u(x,0)=I(x),\\
+& \varrho u_t = \nabla \cdot (\alpha(u)\nabla u) + f,\\
+& u(0)=I,\\
 & \frac{\partial u}{\partial n} = 0
 \end{align}
 
@@ -37,17 +37,27 @@ Now that we have an expression for $u$ in time, we need to derive an approximati
 %L(v) &= \int_\Omega \varrho u^{n-1}vdx + \Delta t \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u^{n})\frac{\partial u}{\partial n}vds
 \int_\Omega \varrho\frac{u^n-u^{n-1}}{\Delta t}vdx = -\int_\Omega\alpha(u^n)\nabla u^n \cdot \nabla v dx + \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u^{n})\frac{\partial u}{\partial n}vds
 \end{align}
-\subsection{Picard iterations for $\alpha(u)$}
+\subsection{Picard iterations for nonlinear term $\alpha(u)$}
 \paragraph*{}
 The problem described above is nonlinear because of the coefficient term $a(u)$. Before we can solve the PDE we need to somehow make this term linear. This can be done by replacing the unknown variable in the nonlinear term with something known.
 \paragraph*{}
-To reduce the amount of indices in our equations we introduce a new notation.
+To reduce the amount of indices in our equations we introduce a new notation. Where $k$ is the picard iteration index.
 \begin{align*}
 u^n &: u \\
 n^{n,k} &: u\_ \\
 u^{n-1} &: u_1
 \end{align*}
-Where $k$ is the picard iteration index. 
+\paragraph*{}
+We can then make all the nonlinear terms linear by replacing the $u$ with the result from the previous picard iteration.
+\begin{align}
+\int_\Omega \varrho\frac{u-u_1}{\Delta t}vdx = -\int_\Omega\alpha(u\_)\nabla u \cdot \nabla v dx + \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u\_)\frac{\partial u}{\partial n}vds
+\end{align}
+\section{Verification}
+\subsection{Convergence rate}
+\subsection{Method of manufactured solution}
+\section{Experiment}
+
+
 
 
 
