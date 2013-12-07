@@ -15,7 +15,7 @@ Final project report for INF5620 on numerical investigation and analysis of a no
 
 \section{Nonlinear diffusion model}
 \paragraph*{}
-The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in space $x$ at time $0$. Naumann condition on all boundaries.
+The project will investigate this nonlinear diffusion equation with known coefficient $\varrho$ and known function coefficient of $\alpha(u)$. Known initial condition in time at $0$. Naumann condition on all boundaries.
 \begin{align}
 & \varrho u_t = \nabla \cdot (\alpha(u)\nabla u) + f,\\
 & u(0)=I,\\
@@ -53,13 +53,19 @@ We can then make all the nonlinear terms linear by replacing the $u$ with the re
 \int_\Omega \varrho\frac{u-u_1}{\Delta t}vdx = -\int_\Omega\alpha(u\_)\nabla u \cdot \nabla v dx + \int_\Omega f^n v dx + \int_{\partial\Omega} \alpha(u\_)\frac{\partial u}{\partial n}vds
 \end{align}
 \section{Verification}
+\paragraph*{}
+Verification tests are implemented using the python nose unit-test framework. The tests can be ran from the terminal with the command\\ \verb|nosetests -v -s wave2d_module.py|, the runtime option \verb|-v| activates verbose output, and the option \verb|-s| deactivates stdout suppression.
 \subsection{Convergence rate}
+\paragraph*{}
+Convergence rate tests are done on a test case where $I = \cos(\pi x)$, $\alpha(u)=1$ and $f = 0$. The exact solution is then $u_e = e^{-\pi^2t} \cos(\pi x)$. The error in time for the backward euler scheme is then $O(\Delta t)$, which is computed by $E = \sqrt{(u_e-u)^2}$
 \subsection{Method of manufactured solution}
+\paragraph*{}
+\textit{Method of manufactured solution} test are implemented by restricting the domain to one dimension and choosing $u_e=tx^2\left(\frac{1}{2}-\frac{x}{3}\right)$ and $\alpha(u)=1+u^2$. The source term is computed to be,
+\begin{align*}
+f = -\frac{1}{3} \varrho x^{3} + \frac{1}{2} \varrho x^{2} + \frac{8}{9} t^{3} x^{7} - \frac{28}{9} t^{3} x^{6} + \frac{7}{2} t^{3} x^{5} - \frac{5}{4} t^{3} x^{4} + 2 t x - t.
+\end{align*}
+The approximated solution $u$ is then compared to $u_e$ over time
 \section{Experiment}
-
-
-
-
-
-
+\paragraph*{}
+Two experiments are implemented using the solver module. \verb|ex_01.py| runs the solver with the same parameters as the convergence test, except in one dimension. \verb|ex_02.py| runs the solver in two dimensions simulating nonlinear diffusion of the gaussian function. Both experiments visualize the solution with a graph updated for each timestep
 \end{document}
