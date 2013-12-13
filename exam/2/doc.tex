@@ -5,9 +5,76 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \author{Jens Kristoffer Reitan Markussen}
-\title{INF5620 Exam, Problem 1}
+\title{INF5620 Exam, Problem 2}
 \begin{document}
 \maketitle
 
+\section*{2D/3D wave equation with finite differences}
+\paragraph*{a)}
+2D wave equation with variable wave velocity
+\begin{align}
+\frac{\partial^2 u}{\partial t^2} &= \frac{\partial}{\partial x}\left(q(x,y)\frac{\partial u}{\partial x}\right) + \frac{\partial}{\partial y} \left(q(x,y)\frac{\partial u}{\partial y}\right), \\
+\frac{\partial t}{\partial n} &= 0, \\
+u(x,y,0) &= I, \\
+\frac{\partial }{\partial t}u(x,y,0) &= V
+\end{align}
+Model can be used to simulate waves on a lake or an ocean, where the function $q(x,y)$ describes sub-sea hill which would cause variable wave velocity
+
+\paragraph*{b)}
+Compact differentiation notation
+\begin{align}
+[D_tD_tu=D_x\overline{q}^xD_xu+D_y\overline{q}^yD_yu]^n_{i,j}
+\end{align}
+Replace derivatives with differences. Apply a centered difference in time,
+\begin{align}
+\frac{\partial^2 u}{\partial t^2} &\approx \frac{u^{n+1}_{i,j}-2u^{n}_{i,j}+u^{n-1}_{i,j}}{\Delta t^2}, \\
+\end{align}
+then discretize the outer derivative of the variable coefficients,
+\begin{align}
+ø &= q(x,y)\frac{\partial u}{\partial x}, \\
+[D_xø]^n_{i,j} &= \frac{ø_{i+\frac{1}{2},j}-ø_{i-\frac{1}{2},j}}{\Delta x}, \\
+ø_{i+\frac{1}{2},j} &= q_{i+\frac{1}{2},j}\frac{u^n_{i+1,j}-u^n_{i,j}}{\Delta x}\\
+ø_{i-\frac{1}{2},j} &= q_{i-\frac{1}{2},j}\frac{u^n_{i,j}-u^n_{i-1,j}}{\Delta x}
+\end{align}
+then combine the results,
+\begin{align}
+\frac{\partial}{\partial x}\left(q(x,y)\frac{\partial u}{\partial x}\right) \approx \frac{1}{\Delta x^2}\left(q_{i+\frac{1}{2},j}(u^n_{i+1,j}-u^n_{i,j})-q_{i-\frac{1}{2},j}(u^n_{i,j}-u^n_{i-1,j})\right).
+\end{align}
+We then need an approximation for the variable coefficient between mesh points, we can get that through by averaging by the arithmetic mean
+\begin{align*}
+q_{i+\frac{1}{2},j} &= \frac{1}{2}(q_{i,j}+q_{i+1,j})\\
+q_{i-\frac{1}{2},j} &= \frac{1}{2}(q_{i,j}+q_{i-1,j})
+\end{align*}
+Then we need to do the same for the last term, and get this,
+\begin{align}
+\frac{\partial}{\partial y}\left(q(x,y)\frac{\partial u}{\partial y}\right) \approx \frac{1}{\Delta y^2}\left(q_{i,j+\frac{1}{2}}(u^n_{i,j+1}-u^n_{i,j})-q_{i,j-\frac{1}{2}}(u^n_{i,j}-u^n_{i,j-1})\right).
+\end{align}
+In the end we combine everything and rearrange so we get $u^{n+1}_{i,j}$ on the left-hand side
+\begin{align}
+u^{n+1}_{i,j} &= -u^{n-1}_{i,j} + 2u^{n}_{i,j} + \\
+& \left(\frac{\Delta x}{\Delta t} \right)^2 \left(q_{i+\frac{1}{2},j}(u^n_{i+1,j}-u^n_{i,j})-q_{i-\frac{1}{2},j}(u^n_{i,j}-u^n_{i-1,j})\right)+ \\
+& \left(\frac{\Delta y}{\Delta t} \right)^2\left(q_{i,j+\frac{1}{2}}(u^n_{i,j+1}-u^n_{i,j})-q_{i,j-\frac{1}{2}}(u^n_{i,j}-u^n_{i,j-1})\right)
+\end{align}
+The initial condition are implemented by special schemes for $n = 0,1$,
+\begin{align}
+u^0_{i,j} &= I_{i,j} \\
+ u^1_{i,j} &= -u^0_{i,j} + \Delta t V_{i,j} + \\
+& \left(\frac{\Delta x}{\Delta t} \right)^2 \left(q_{i+\frac{1}{2},j}(u^n_{i+1,j}-u^n_{i,j})-q_{i-\frac{1}{2},j}(u^n_{i,j}-u^n_{i-1,j})\right)+ \\
+& \left(\frac{\Delta y}{\Delta t} \right)^2\left(q_{i,j+\frac{1}{2}}(u^n_{i,j+1}-u^n_{i,j})-q_{i,j-\frac{1}{2}}(u^n_{i,j}-u^n_{i,j-1})\right)
+\end{align}
+Now $u^{n}_{i,j}$ and $u^{n-1}_{i,j}$ are known, so we can compute $u^{n+1}_{i,j}$. Since its a PDE, we also need to handle boundary conditions
+\paragraph*{c)}
+discretization extended to 3D
+
+\paragraph*{d)}
+\begin{align}
+\Delta t \leqslant \beta \frac{1}{\sqrt{\max q(x,y,z)}}\left(\frac{1}{\Delta x^2}+\frac{1}{\Delta y^2}\frac{1}{\Delta z^2}\right)^{-\frac{1}{2}}
+\end{align}
+
+\paragraph*{e)}
+explain how we can verify the implementation of the scheme
+
+\paragraph*{f)}
+When looking at the schemes we notice that non of the spacial indices ($i,j,k$) are dependant on any neighbouring indices being already computed, because of this we can for each time step, compute all the spacial nodes in parallel
 
 \end{document}
