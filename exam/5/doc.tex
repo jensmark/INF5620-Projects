@@ -5,9 +5,49 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \author{Jens Kristoffer Reitan Markussen}
-\title{INF5620 Exam, Problem 1}
+\title{INF5620 Exam, Problem 5}
 \begin{document}
 \maketitle
+\section*{Nonlinear diffusion}
+\begin{align}
+u_t &= \nabla\cdot (\alpha(u)\nabla u),\quad x\in\Omega,
+t >0\\
+u(x,0) &= I(x),\quad x\in\Omega\\
+u(x,t) &= g(x),\quad x\in\partial\Omega_D,\ t>0\\
+-\alpha(u)\frac{\partial}{\partial n} u(x, t) &= h(u - T_s),\quad
+x\in\partial\Omega_R \\
+\alpha(u) &= (1+\alpha_0u^4)
+\end{align}
+\paragraph*{a)}
+Compact difference notation CN,
+\begin{align}
+[D_tu = \nabla \cdot (\overline{\alpha(u)}^t\nabla u)]^{n+\frac{1}{2}}
+\end{align}
+Written out
+\begin{align}
+\frac{u^{n+1}-u^n}{\Delta t} &=  \nabla \cdot (\overline{\alpha(u^{n+\frac{1}{2}})}^t\nabla u^{n+\frac{1}{2}})\\
+\frac{u^{n+1}-u^n}{\Delta t} &=  \frac{1}{4}(\nabla \cdot (\alpha(u^n)+\alpha(u^{n+1})\nabla(u^n+u^{n+1}))
+\end{align}
+Picard
+\begin{align}
+F(u^{n+1}) = u^{n+1}-u^n - \Delta t\frac{1}{4}(\nabla \cdot (\alpha(u^n)+\alpha(u^{n+1})\nabla(u^n+u^{n+1}))
+\end{align}
+Replace $u^{n+1}$ with $u^{n+1,k}$, where $k$ is the picard iteration index, in all the non-linear terms
+\begin{align}
+F(u^{n+1}) = u^{n+1}-u^n - \Delta t\frac{1}{4}(\nabla \cdot (\alpha(u^n)+\alpha(u^{n+1,k})\nabla(u^n+u^{n+1,k}))
+\end{align}
+\paragraph*{b)}
+Perform a Backward-Euler time discretization and derive the variational form for the resulting spatial problems. Picard iteration method to linearize \\
 
+..
+
+\paragraph*{c)}
+Newton’s method to the nonlinear variational form F = 0 in b).
+\begin{align}
+J_{i,j} \delta u = -F_i 
+\end{align}
+\begin{align*}
+J_{i,j} = \frac{\partial F_i}{\partial u_j}
+\end{align*}
 
 \end{document}

@@ -20,7 +20,28 @@ u_{t}(0) &= 0, \\
 Approximate initial condition by finite elements method using the principles of least squares, projection (Galerkin), and interpolation (collocation).
 
 \paragraph*{b)}
+Discretization in time with centred differences
+\begin{align}
+u_{tt} \approx \frac{u^{n+1}_{i,j}-2u^{n}_{i,j}+u^{n-1}_{i,j}}{\Delta t^2}
+\end{align}
+Derive variational formulation by Galerkin method
+\begin{align}
+a(u,v) &= \int \\
+L(v) &= \int
+\end{align}
+Derive formulas for element matrix
+\begin{align}
+A_{i,j} =
+\end{align}
+
 \paragraph*{c)}
+Show how the element matrix is computed for P1 elements. Explain the assembly principle and what the resulting global matrix look like when all cells have equal length.\\ 
+
+...
+
 \paragraph*{d)}
+Set up the discrete equations for this wave problem on operator form (assume P1 elements). Analysis of the scheme based on exact solution of the discrete equations. Compare with results from finite difference method. \\
+
+...
 
 \end{document}
