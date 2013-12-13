@@ -64,15 +64,28 @@ u^0_{i,j} &= I_{i,j} \\
 \end{align}
 Now $u^{n}_{i,j}$ and $u^{n-1}_{i,j}$ are known, so we can compute $u^{n+1}_{i,j}$. Since its a PDE, we also need to handle boundary conditions
 \paragraph*{c)}
-discretization extended to 3D
+In 3 dimensions we get an addition term,
+\begin{align*}
+\frac{\partial}{\partial z} \left(q(x,y,z)\frac{\partial u}{\partial z}\right)
+\end{align*}
+that can be descretized in the same way as the two other spacial terms.
 
 \paragraph*{d)}
+Stability limit for $\Delta t$
 \begin{align}
-\Delta t \leqslant \beta \frac{1}{\sqrt{\max q(x,y,z)}}\left(\frac{1}{\Delta x^2}+\frac{1}{\Delta y^2}\frac{1}{\Delta z^2}\right)^{-\frac{1}{2}}
+\Delta t \leqslant \beta \frac{1}{\sqrt{\max q(x,y,z)}}\left(\frac{1}{\Delta x^2}+\frac{1}{\Delta y^2}+\frac{1}{\Delta z^2}\right)^{-\frac{1}{2}}
 \end{align}
-
+Accuracy measurement
+\begin{align}
+\widetilde{w} = 
+\end{align}
 \paragraph*{e)}
-explain how we can verify the implementation of the scheme
+Explain how we can verify the implementation of the scheme
+\begin{enumerate}
+\item MMS
+\item Convergance rate
+\item ..
+\end{enumerate}
 
 \paragraph*{f)}
 When looking at the schemes we notice that non of the spacial indices ($i,j,k$) are dependant on any neighbouring indices being already computed, because of this we can for each time step, compute all the spacial nodes in parallel

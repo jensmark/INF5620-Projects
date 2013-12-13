@@ -5,9 +5,53 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \author{Jens Kristoffer Reitan Markussen}
-\title{INF5620 Exam, Problem 1}
+\title{INF5620 Exam, Problem 3}
 \begin{document}
 \maketitle
+\section*{Analysis of wave problems}
+\paragraph*{a)}
+\begin{align}
+u''(t) + \omega^2u(t)&=0,\\
+u(0) &= I\\
+u'(0) &= V 
+\end{align}
+Compact differentiation notation
+\begin{align*}
+[D_tD_tu+\omega^2u(t)=0]^n
+\end{align*}
+Explain how the stability and the accuracy of this scheme can be investigated via exact solutions of the discrete equations.Illustrate the numerical problems that can arise from this scheme. \\
 
+...
+
+\paragraph*{b)}
+Wave equation
+\begin{align}
+u_{tt} &= c^2u_{xx}\\
+u_{x} &= 0\\
+u(0) &= I\\
+u_{t}(0) &= V 
+\end{align}
+Compact differentiation notation
+\begin{align*}
+[D_tD_tu=c^2D_xD_x]^n_i
+\end{align*}
+Explain how the stability and the accuracy of this scheme can be investigated via exact solutions of the discrete equations. \\
+
+...
+
+\paragraph*{c)}
+Explain how the analysis can help us to understand why a smooth initial condition gives relatively small numerical artifacts, and why a less smooth initial condition gives rise to significant numerical artifacts. \\
+
+...
+
+\paragraph*{d)}
+Truncation error analysis on a), correction term so the order of the scheme becomes $\Delta t^4$ \\
+
+...
+
+\paragraph*{e)}
+Truncation error analysis on b), correction term so the order of the scheme becomes $\Delta t^4$, $\Delta x^4$\\
+
+...
 
 \end{document}
