@@ -17,27 +17,118 @@ u_{t}(0) &= 0, \\
 \Omega &= [0,L]
 \end{align}
 \paragraph*{a)}
-Approximate initial condition by finite elements method using the principles of least squares, projection (Galerkin), and interpolation (collocation).
+\begin{enumerate}
+\item Least squares\\
+We want to minimize the distance between $f$ and $u$ by finding $c_0,...,c_N$. This requires a norm for measuring distances, and a norm is most conveniently defined through an inner product. 
+\begin{align}
+(f,g) = \int_\Omega f(x)g(x)dx
+\end{align}
+The distance between $f$ and any $u\in V$ is $f-u$, the squared norm of that distance is
+\begin{align}
+E=(f(x)-\sum_{j\in I} c_j\psi_j(x),f(x)-\sum_{j\in I} c_j\psi_j(x)) 
+\end{align}
+then rewritten,
+\begin{align*}
+E(c_0,...,c_N)=(f,f)-2\sum_{j\in I}c_j(f,\psi_i)+\sum_{p\in I}\sum_{q\in I}c_pc_q(\psi_p\psi_q)
+\end{align*}
+Then to minimize $E$ with respect to $c_i$ we require that 
+\begin{align}
+\frac{\partial E}{\partial c_i} = 0
+\end{align}
+The terms are differentiated as
+\begin{align*}
+\frac{\partial }{\partial c_i}\sum_{j\in I}c_j(f,\psi_i) &= (f,\psi_i)\\
+\frac{\partial }{\partial c_i}\sum_{p\in I}\sum_{q\in I}c_pc_q(\psi_p\psi_q) &= 2\sum_{j\in I}c_i(\psi_i\psi_j)
+\end{align*}
+Leads to a linear system 
+\begin{align}
+\sum_{j\in I}A_{i,j}c_j = b_i
+\end{align}
+where
+\begin{align*}
+A_{i,j} &= (\psi_i,\psi_j)\\
+b_i &= (\psi_i, f)
+\end{align*}
+
+\item Galerkin\\
+Again we want to minimize the distance between $f$ and $u$, in this case minimizing the distance (error) $e$ is equivalent to demanding that $e$ is orthogonal to all $v \in V$,
+\begin{align}
+(e,v) =0
+\end{align}
+this is equivalent to
+\begin{align*}
+(e, \sum_{i\in I}c_i \psi_i) =0
+\end{align*}
+For any coefficient $c_0,...c_N$ we rewrite the equation as
+\begin{align*}
+\sum_{i\in I}c_i (e,\psi_i) =0
+\end{align*}
+This results in the same linear system as with the least squares method. These N + 1 equations result in the same linear system,
+\begin{align*}
+(f,\psi_i)-\sum_{j\in I}c_j(\psi_i\psi_j) &= 0\\
+\sum_{j\in I}c_j(\psi_i\psi_j) &= (f,\psi_i)
+\end{align*}
+resulting in
+\begin{align*}
+\sum_{j\in I}A_{i,j}c_j &= b_i\\
+A_{i,j} &= (\psi_i,\psi_j)\\
+b_i &= (\psi_i, f)
+\end{align*}
+\item Collocation\\
+Here we demand that $u(x_i)=f(x_i)$ at selected points $x_i$
+\begin{align}
+u(x_i)=\sum_{j\in I}c_j\psi_j(x_i)=f(x_i) 
+\end{align}
+resulting in the same linear system 
+\begin{align*}
+\sum_{j\in I}A_{i,j}c_j &= b_i\\
+\end{align*}
+where
+\begin{align*}
+A_{i,j} &= \psi_j(x_i)\\
+b_i &= f(x_i)
+\end{align*}
+\end{enumerate}
 
 \paragraph*{b)}
 Discretization in time with centred differences
 \begin{align}
-u_{tt} \approx \frac{u^{n+1}_{i,j}-2u^{n}_{i,j}+u^{n-1}_{i,j}}{\Delta t^2}
+u_{tt} \approx \frac{u^{n+1}-2u^{n}+u^{n-1}}{\Delta t^2}
+\end{align}
+Galerkin rule
+\begin{align}
+(R,\psi_i)=0
 \end{align}
 Derive variational formulation by Galerkin method
-\begin{align}
-a(u,v) &= \int \\
-L(v) &= \int
-\end{align}
+\begin{align*}
+\int_\Omega \frac{u^{n+1}-2u^{n}+u^{n-1}}{\Delta t^2}vdx &= \int_\Omega c^2u^n_{xx}vdx + \int_\Omega f^nvdx \\
+\int_\Omega u^{n+1}+u^{n-1}vdx &=\int_\Omega-2u^{n}vdx+ \Delta t^2\int_\Omega c^2u^n_{xx}vdx + \Delta t^2\int_\Omega f^nvdx\\
+\int_\Omega u^{n+1}+u^{n-1}vdx &=\int_\Omega-2u^{n}vdx+ \Delta t^2\int_\Omega c^2u^n_{x}v_{x}dx + \Delta t^2\int_\Omega f^nvdx
+\end{align*}
 Derive formulas for element matrix
 \begin{align}
-A_{i,j} =
+A_{i,j} = (\psi_i,\psi_j)
 \end{align}
 
 \paragraph*{c)}
-Show how the element matrix is computed for P1 elements. Explain the assembly principle and what the resulting global matrix look like when all cells have equal length.\\ 
-
-...
+P1 elements are defined as when all cell have equal length $h$
+\begin{equation}
+\varphi(x) = \left\{ 
+  \begin{array}{l l}
+    0, & \quad x<x_{i-1}\\
+    (x-x_{i-1})/h, & \quad x_{i-1}\leqslant x \leq x_{i}\\
+    1-(x-x_{i})/h, & \quad x_{i}\leqslant x \leq x_{i+1}\\
+    0, & \quad x\geqslant x_{i+1}
+  \end{array} \right.
+\end{equation}
+Creates hat-like functions over each element. $\psi$ is then replaced by $\varphi$ and a element matrix entry is then computed as following
+\begin{align}
+A^{(e)}_{i,j}= \int_{\Omega^{(e)}} \varphi_i \varphi_j dx
+\end{align}
+Now $A^{(e)}_{i,j}\neq0$, only if $i$ and $j$ nodes of the same element $e$. Introduce $i = q(e,r)$ and $j = q(e,s)$ for mapping between local and global node numbering
+\begin{align}
+A^{(e)}_{r,s}= \int_{\Omega^{(e)}} \varphi_{q(e,r)}(x) \varphi_{q(e,s)}(x) dx
+\end{align}
 
 \paragraph*{d)}
 Set up the discrete equations for this wave problem on operator form (assume P1 elements). Analysis of the scheme based on exact solution of the discrete equations. Compare with results from finite difference method. \\
