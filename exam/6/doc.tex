@@ -13,8 +13,67 @@
 -u''(x) = 2,\quad x\in (0,1),\quad u(0)=\beta,\ u(1)=\gamma,
 \end{align}
 \paragraph*{a)}
+\begin{enumerate}
+\item Least-squares\\
+The least-squares method aims to find $c_0,...c_N$ such that the square norm of the residual is minimized.
+\begin{align}
+||R||=(R,R)= \int_\Omega R^2dx
+\end{align}
+Differentiating with respect to the free parameters $c_0,...,c_N$ gives the $N + 1$ equations
+\begin{align*}
+\int_\Omega 2R\frac{\partial R}{\partial c_i}dx = 0
+\end{align*}
+\item Galerkin\\
+With a differential equation we do not know the true error so we must instead require the residual $R$ to be orthogonal to $V$. This statement is equivalent to R being orthogonal to the N +1 basis functions
+\begin{align*}
+(R,\psi_i) =0
+\end{align*}
+resulting in $N + 1$ equations for determining $c_0,...,c_N$ .
+\item Collocation \\
+Demand that $R$ vanishes at $N + 1$ selected points $x0,...,xN$ in $\Omega$
+\begin{align*}
+R(x_i;c_0,...,c_N) = 0
+\end{align*}
+can also be viewed as a method of weighted residuals with Dirac delta functions as weighting functions.
+\begin{align*}
+\int_\Omega f(x)\delta(x-x_i)dx = f(x_i)
+\end{align*}
+\end{enumerate}
+
+
 \paragraph*{b)}
+\begin{align}
+V &= span\{\sin (\pi x)\}\\
+\psi_i(x) &= \sin\left((i+1)\pi x\right)\\
+\beta &= \gamma = 2
+\end{align}
+The residual
+\begin{align*}
+R(x;c_0,...c_N) = \sum_{j\in\Omega}c_j\psi_j''(x)+2
+\end{align*}
+\begin{enumerate}
+\item Least-squares\\
+We need an expression for $\frac{\partial R}{\partial c_i}$, we have
+\begin{align*}
+\frac{\partial R}{\partial c_i} = \sum_{j\in\Omega}\frac{\partial c_j}{\partial c_i}\psi_j''(x) = \psi_i''(x)
+\end{align*}
+equations for $c_0,...c_N$ rearranged are then 
+\begin{align*}
+\sum_{j\in\Omega}(\psi_i''\psi_j'')c_j = -(2,\psi_j'')
+\end{align*}
+\begin{align*}
+4 \frac{\cos\left(\pi i\right) + 1}{\pi^{3} \left(i^{3} + 3 i^{2} + 3 i + 1\right)}
+\end{align*}
+\end{enumerate}
+
 \paragraph*{c)}
+Now we want to use P2 elements on a uniform mesh. Explain how to calculate the element matrix and vector for cells in the interior of the mesh (those not affected by boundary conditions) and set up the results. Describe how the element matrix and vector are assembled into the global linear sytem.
+
+...
+
 \paragraph*{d)}
+Use only one element and explain how the boundary conditions affect the element matrix and vector. Why does this numerical solution coincide with the exact one? Two equal-sized P1 elements lead to exact values at the nodes. Sketch these P2 and P1 solutions.
+
+...
 
 \end{document}
